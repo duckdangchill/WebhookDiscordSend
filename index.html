@@ -3,36 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Discord Relay • Chuyển văn bản Cloud</title>
+  <title>Cloud Relay • Chuyển văn bản & Tệp về Discord</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #14161a;
-      --card-bg: #1b1e24;
-      --card-border: rgba(255, 255, 255, 0.04);
-      --surface-inset: #121316;
+      --bg: #121418;
+      --card-bg: #191c22;
+      --card-border: rgba(255, 255, 255, 0.045);
+      --surface-inset: #111317;
+      --surface-hover: #20242c;
       --text-main: #f1f3f7;
-      --text-muted: #858b98;
-      --text-dim: #555b68;
+      --text-muted: #88909e;
+      --text-dim: #545b69;
       --accent: #5865f2;
       --accent-hover: #4752c4;
       --accent-surface: rgba(88, 101, 242, 0.12);
       --success: #10b981;
+      --success-surface: rgba(16, 185, 129, 0.12);
       --danger: #ef4444;
       --danger-surface: rgba(239, 68, 68, 0.12);
       
-      /* Neumorphic shadow layers */
+      /* Tactile Neumorphic Layers */
       --shadow-raised: 
-        -5px -5px 12px rgba(255, 255, 255, 0.025),
-        6px 6px 16px rgba(0, 0, 0, 0.65);
+        -6px -6px 14px rgba(255, 255, 255, 0.025),
+        7px 7px 18px rgba(0, 0, 0, 0.65);
       --shadow-raised-sm:
         -3px -3px 8px rgba(255, 255, 255, 0.02),
         4px 4px 10px rgba(0, 0, 0, 0.55);
       --shadow-inset: 
         inset 3px 3px 6px rgba(0, 0, 0, 0.7),
-        inset -2px -2px 6px rgba(255, 255, 255, 0.02);
+        inset -2px -2px 6px rgba(255, 255, 255, 0.025);
       --shadow-active: 
         inset 2px 2px 4px rgba(0, 0, 0, 0.7),
         inset -1px -1px 3px rgba(255, 255, 255, 0.03);
@@ -52,22 +54,26 @@
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg);
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(88, 101, 242, 0.08), transparent 70%);
+      background-size: 22px 22px, 100% 100%;
+      background-attachment: fixed;
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 24px 16px;
+      padding: 28px 16px 40px;
       line-height: 1.5;
     }
 
     .app-container {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      margin: auto 0;
+      gap: 18px;
     }
 
     /* Header */
@@ -75,7 +81,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 8px;
+      padding: 4px 6px;
     }
 
     .brand {
@@ -85,8 +91,8 @@
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: var(--radius-sm);
       background: var(--card-bg);
       box-shadow: var(--shadow-raised-sm);
@@ -113,7 +119,7 @@
     .status-badge {
       font-size: 0.75rem;
       font-weight: 600;
-      padding: 5px 12px;
+      padding: 6px 12px;
       border-radius: 20px;
       display: flex;
       align-items: center;
@@ -121,7 +127,7 @@
       background: var(--surface-inset);
       box-shadow: var(--shadow-inset);
       color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
     .status-dot {
@@ -133,14 +139,57 @@
 
     .status-badge.connected .status-dot {
       background: var(--success);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
     }
 
     .status-badge.connected {
       color: var(--text-main);
     }
 
-    /* Main Box / Card */
+    /* Info Bar / Specs Strip */
+    .specs-strip {
+      display: flex;
+      gap: 10px;
+    }
+
+    .spec-item {
+      flex: 1;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-raised-sm);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .spec-icon {
+      color: var(--accent);
+      opacity: 0.85;
+      display: flex;
+    }
+
+    .spec-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spec-label {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .spec-value {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Cards */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius-lg);
@@ -152,9 +201,14 @@
       gap: 20px;
     }
 
-    /* Section Label */
+    .card-secondary {
+      padding: 18px 22px;
+      gap: 14px;
+    }
+
+    /* Field Labels */
     .field-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -179,7 +233,7 @@
     .inset-input {
       flex: 1;
       background: var(--surface-inset);
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
       border-radius: var(--radius-sm);
       padding: 12px 14px;
       color: var(--text-main);
@@ -204,21 +258,28 @@
       align-items: center;
       justify-content: space-between;
       background: var(--surface-inset);
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.03);
       border-radius: var(--radius-sm);
-      padding: 10px 14px;
+      padding: 11px 14px;
       box-shadow: var(--shadow-inset);
+    }
+
+    .webhook-masked-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
     }
 
     .webhook-masked {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.82rem;
       color: var(--text-muted);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 260px;
+      max-width: 270px;
     }
 
     .btn-icon-text {
@@ -261,7 +322,7 @@
     .btn-primary {
       background: var(--accent);
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(88, 101, 242, 0.4);
+      box-shadow: 0 4px 14px rgba(88, 101, 242, 0.45);
       border: none;
     }
 
@@ -282,6 +343,7 @@
 
     .btn-secondary:hover {
       color: #ffffff;
+      background: var(--surface-hover);
     }
 
     .btn-secondary:active {
@@ -317,7 +379,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 12px 8px;
+      padding: 11px 8px;
       border-radius: var(--radius-sm);
       cursor: pointer;
       color: var(--text-muted);
@@ -350,7 +412,7 @@
 
     .device-option input[type="radio"]:checked + .device-label .device-format-hint {
       color: var(--accent);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     /* Textarea Section */
@@ -367,15 +429,15 @@
 
     .content-textarea {
       width: 100%;
-      min-height: 160px;
+      min-height: 120px;
       resize: vertical;
       background: var(--surface-inset);
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.025);
       border-radius: var(--radius-md);
       padding: 14px;
       color: var(--text-main);
       font-family: inherit;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       line-height: 1.6;
       box-shadow: var(--shadow-inset);
       outline: none;
@@ -383,7 +445,7 @@
     }
 
     .content-textarea:focus {
-      border-color: rgba(88, 101, 242, 0.45);
+      border-color: rgba(88, 101, 242, 0.5);
     }
 
     .content-textarea::placeholder {
@@ -399,7 +461,7 @@
     }
 
     .char-counter {
-      font-size: 0.74rem;
+      font-size: 0.73rem;
       color: var(--text-dim);
       font-family: 'JetBrains Mono', monospace;
     }
@@ -428,6 +490,166 @@
       background: rgba(255, 255, 255, 0.05);
     }
 
+    /* File Attachment Dropzone */
+    .attachment-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dropzone {
+      background: var(--surface-inset);
+      box-shadow: var(--shadow-inset);
+      border: 1.5px dashed rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 18px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(88, 101, 242, 0.04);
+    }
+
+    .dropzone-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-raised-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+
+    .dropzone-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .dropzone-sub {
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kbd-chip {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-raised-sm);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* File Preview List */
+    .attached-files-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .file-preview-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-inset);
+      box-shadow: var(--shadow-inset);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      gap: 12px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .file-info-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .file-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #000;
+      flex-shrink: 0;
+    }
+
+    .file-icon-placeholder {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .file-meta {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .file-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+
+    .file-size {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-remove-file {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      padding: 5px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-remove-file:hover {
+      color: var(--danger);
+      background: var(--danger-surface);
+    }
+
     /* Send Button */
     .send-btn {
       width: 100%;
@@ -442,6 +664,92 @@
       cursor: not-allowed;
       transform: none !important;
       box-shadow: none !important;
+    }
+
+    /* Recent History Card */
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .history-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-inset);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      box-shadow: var(--shadow-inset);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      font-size: 0.8rem;
+    }
+
+    .history-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      overflow: hidden;
+    }
+
+    .history-type-icon {
+      color: var(--text-dim);
+      display: flex;
+      flex-shrink: 0;
+    }
+
+    .history-snippet {
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+
+    .history-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .history-time {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+    }
+
+    .history-tag {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      background: var(--success-surface);
+      color: var(--success);
+    }
+
+    .history-empty {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      padding: 12px 0;
     }
 
     /* Toast Notification */
@@ -460,13 +768,13 @@
     }
 
     .toast {
-      background: #1e2229;
+      background: #1c1f26;
       color: var(--text-main);
       padding: 12px 18px;
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
       font-weight: 500;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
@@ -529,7 +837,7 @@
     <header class="header">
       <div class="brand">
         <div class="brand-icon">
-          <!-- Webhook/Relay Icon -->
+          <!-- Webhook Relay Icon -->
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
@@ -537,7 +845,7 @@
         </div>
         <div>
           <h1 class="brand-title">Cloud Relay</h1>
-          <p class="brand-subtitle">Cầu nối văn bản về Discord</p>
+          <p class="brand-subtitle">Cầu nối Văn bản & Tệp về Discord</p>
         </div>
       </div>
       <div id="statusBadge" class="status-badge">
@@ -545,6 +853,48 @@
         <span id="statusText">Chưa cấu hình</span>
       </div>
     </header>
+
+    <!-- Specs & Stats Bar -->
+    <section class="specs-strip">
+      <div class="spec-item">
+        <div class="spec-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="spec-content">
+          <span class="spec-label">Máy chủ</span>
+          <span class="spec-value">Direct Discord</span>
+        </div>
+      </div>
+
+      <div class="spec-item">
+        <div class="spec-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        <div class="spec-content">
+          <span class="spec-label">Tối đa</span>
+          <span class="spec-value">25 MB / lượt</span>
+        </div>
+      </div>
+
+      <div class="spec-item">
+        <div class="spec-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+            <polyline points="9 11 12 14 22 4"/>
+          </svg>
+        </div>
+        <div class="spec-content">
+          <span class="spec-label">Dán ảnh</span>
+          <span class="spec-value">Ctrl + V</span>
+        </div>
+      </div>
+    </section>
 
     <!-- Main Card -->
     <main class="card">
@@ -571,7 +921,12 @@
 
         <!-- Thanh hiển thị khi đã lưu -->
         <div id="webhookSavedBar" class="webhook-saved-bar hidden">
-          <div class="webhook-masked" id="webhookDisplay">https://discord.com/api/webhooks/•••</div>
+          <div class="webhook-masked-group">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <div class="webhook-masked" id="webhookDisplay">https://discord.com/api/webhooks/•••</div>
+          </div>
           <button type="button" id="deleteWebhookBtn" class="btn-icon-text" title="Xóa webhook để đổi link mới">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 6h18"></path>
@@ -621,14 +976,14 @@
       <!-- Message Textarea -->
       <section class="text-section">
         <label class="field-label" for="messageInput">
-          <span>Nội dung gửi</span>
+          <span>Nội dung văn bản (tùy chọn nếu có gửi file)</span>
         </label>
         <div class="textarea-wrapper">
           <textarea 
             id="messageInput" 
             class="content-textarea" 
             placeholder="Dán link hoặc nhập văn bản cần chuyển về máy tại đây..."
-            rows="6"
+            rows="5"
           ></textarea>
         </div>
         <div class="text-toolbar">
@@ -643,6 +998,35 @@
         </div>
       </section>
 
+      <!-- File Attachment Section -->
+      <section class="attachment-section">
+        <div class="field-label">
+          <span>Đính kèm Tệp / Ảnh / Video</span>
+          <span id="fileTotalSize" style="font-size: 0.72rem; color: var(--text-dim); text-transform: none;">Tối đa 25MB</span>
+        </div>
+
+        <input type="file" id="fileInput" multiple accept="*/*">
+
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div class="dropzone-title">Kéo thả tệp vào đây hoặc bấm để duyệt</div>
+          <div class="dropzone-sub">
+            <span>Hỗ trợ chụp màn hình</span>
+            <span class="kbd-chip">Ctrl + V</span>
+            <span>dán ảnh tức thì</span>
+          </div>
+        </div>
+
+        <!-- Danh sách tệp đính kèm -->
+        <div class="attached-files-list" id="attachedFilesList"></div>
+      </section>
+
       <!-- Action Button -->
       <button type="button" id="sendBtn" class="btn btn-primary send-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -653,8 +1037,26 @@
       </button>
     </main>
 
+    <!-- Recent Session Activity Card -->
+    <section class="card card-secondary">
+      <div class="history-header">
+        <div class="history-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Lịch sử gửi gần đây</span>
+        </div>
+        <button type="button" id="clearHistoryBtn" class="btn-clear-text" style="font-size: 0.72rem;">Xóa lịch sử</button>
+      </div>
+
+      <div class="history-list" id="historyList">
+        <div class="history-empty" id="historyEmpty">Chưa có lượt gửi nào trong phiên này</div>
+      </div>
+    </section>
+
     <footer class="footer-note">
-      Dữ liệu Webhook được lưu trực tiếp trên trình duyệt máy này. Tự động xóa văn bản sau khi gửi thành công.
+      Gửi trực tiếp lên Discord qua Webhook. Dữ liệu và Webhook lưu nội bộ trên máy bạn.
     </footer>
   </div>
 
@@ -665,7 +1067,12 @@
     (function() {
       const STORAGE_KEY_WEBHOOK = 'cloud_relay_discord_webhook';
       const STORAGE_KEY_DEVICE = 'cloud_relay_target_device';
-      const MAX_DISCORD_CHARS = 1990; // Discord limit is 2000, reserving safe space for backticks
+      const MAX_DISCORD_CHARS = 1990;
+      const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB Discord limit
+
+      // State
+      let attachedFiles = [];
+      let recentHistory = [];
 
       // DOM Elements
       const webhookForm = document.getElementById('webhookForm');
@@ -687,7 +1094,18 @@
       const sendBtnText = document.getElementById('sendBtnText');
       const toastContainer = document.getElementById('toastContainer');
 
-      // Initialize State
+      // File DOM
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('fileInput');
+      const attachedFilesList = document.getElementById('attachedFilesList');
+      const fileTotalSize = document.getElementById('fileTotalSize');
+
+      // History DOM
+      const historyList = document.getElementById('historyList');
+      const historyEmpty = document.getElementById('historyEmpty');
+      const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+      // Initialize
       function init() {
         const savedWebhook = localStorage.getItem(STORAGE_KEY_WEBHOOK);
         if (savedWebhook) {
@@ -704,14 +1122,13 @@
         }
 
         updateCharCounter();
+        renderHistory();
       }
 
-      // Webhook state view helpers
       function showSavedWebhook(url) {
         webhookForm.classList.add('hidden');
         webhookSavedBar.classList.remove('hidden');
 
-        // Mask webhook token for clean UI
         try {
           const parsed = new URL(url);
           const parts = parsed.pathname.split('/');
@@ -733,7 +1150,6 @@
         statusText.textContent = 'Chưa cấu hình';
       }
 
-      // Toast feedback
       function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
@@ -745,18 +1161,22 @@
         toast.innerHTML = `${iconSvg}<span>${message}</span>`;
         toastContainer.appendChild(toast);
 
-        // Animation trigger
-        requestAnimationFrame(() => {
-          toast.classList.add('show');
-        });
-
+        requestAnimationFrame(() => toast.classList.add('show'));
         setTimeout(() => {
           toast.classList.remove('show');
           setTimeout(() => toast.remove(), 250);
         }, 3200);
       }
 
-      // Event: Save Webhook
+      function formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+      }
+
+      // Webhook events
       saveWebhookBtn.addEventListener('click', () => {
         const val = webhookInput.value.trim();
         if (!val) {
@@ -776,25 +1196,20 @@
         showToast('Đã lưu Webhook vào trình duyệt!');
       });
 
-      // Event: Delete / Change Webhook
       deleteWebhookBtn.addEventListener('click', () => {
         if (confirm('Bạn có muốn xóa Webhook hiện tại để nhập liên kết mới?')) {
           localStorage.removeItem(STORAGE_KEY_WEBHOOK);
           showWebhookInput();
           webhookInput.focus();
-          showToast('Đã xóa Webhook cũ');
+          showToast('Đã xóa Webhook');
         }
       });
 
-      // Event: Device Choice Change
-      devPhoneRadio.addEventListener('change', () => {
-        localStorage.setItem(STORAGE_KEY_DEVICE, 'phone');
-      });
-      devPcRadio.addEventListener('change', () => {
-        localStorage.setItem(STORAGE_KEY_DEVICE, 'pc');
-      });
+      // Device choice
+      devPhoneRadio.addEventListener('change', () => localStorage.setItem(STORAGE_KEY_DEVICE, 'phone'));
+      devPcRadio.addEventListener('change', () => localStorage.setItem(STORAGE_KEY_DEVICE, 'pc'));
 
-      // Event: Clear Text
+      // Clear text
       clearTextBtn.addEventListener('click', () => {
         if (!messageInput.value) return;
         messageInput.value = '';
@@ -802,7 +1217,6 @@
         messageInput.focus();
       });
 
-      // Character count update
       function updateCharCounter() {
         const len = messageInput.value.length;
         charCounter.textContent = `${len} / ${MAX_DISCORD_CHARS} ký tự`;
@@ -812,10 +1226,182 @@
           charCounter.classList.remove('warning');
         }
       }
-
       messageInput.addEventListener('input', updateCharCounter);
 
-      // Event: Send Message
+      // --- File Attachment Handling ---
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+        fileInput.value = '';
+      });
+
+      // Drag & drop
+      ['dragenter', 'dragover'].forEach(event => {
+        dropzone.addEventListener(event, (e) => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(event => {
+        dropzone.addEventListener(event, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer && e.dataTransfer.files) {
+          handleFiles(e.dataTransfer.files);
+        }
+      });
+
+      // Paste image from clipboard (Ctrl + V anywhere)
+      window.addEventListener('paste', (e) => {
+        const items = e.clipboardData && e.clipboardData.items;
+        if (!items) return;
+
+        let hasImage = false;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            if (file) {
+              const ext = file.type.split('/')[1] || 'png';
+              const timeStr = new Date().toTimeString().slice(0, 8).replace(/:/g, '-');
+              const renamedFile = new File([file], `screenshot_${timeStr}.${ext}`, { type: file.type });
+              handleFiles([renamedFile]);
+              showToast('Đã nạp ảnh chụp từ bộ nhớ tạm!');
+              hasImage = true;
+              break;
+            }
+          }
+        }
+      });
+
+      function handleFiles(files) {
+        let currentTotal = attachedFiles.reduce((acc, f) => acc + f.size, 0);
+
+        for (let file of files) {
+          if (currentTotal + file.size > MAX_FILE_SIZE_BYTES) {
+            showToast(`Vượt quá giới hạn 25MB của Discord: ${file.name}`, 'error');
+            continue;
+          }
+          currentTotal += file.size;
+          attachedFiles.push(file);
+        }
+
+        renderAttachedFiles();
+      }
+
+      function removeFile(index) {
+        attachedFiles.splice(index, 1);
+        renderAttachedFiles();
+      }
+
+      function renderAttachedFiles() {
+        attachedFilesList.innerHTML = '';
+        const total = attachedFiles.reduce((acc, f) => acc + f.size, 0);
+
+        if (attachedFiles.length > 0) {
+          fileTotalSize.textContent = `Tổng: ${formatBytes(total)} / 25 MB`;
+        } else {
+          fileTotalSize.textContent = 'Tối đa 25MB';
+        }
+
+        attachedFiles.forEach((file, index) => {
+          const item = document.createElement('div');
+          item.className = 'file-preview-item';
+
+          const isImg = file.type.startsWith('image/');
+          let iconOrThumbHtml = '';
+
+          if (isImg) {
+            const objUrl = URL.createObjectURL(file);
+            iconOrThumbHtml = `<img src="${objUrl}" class="file-thumb" alt="preview">`;
+          } else {
+            iconOrThumbHtml = `
+              <div class="file-icon-placeholder">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+              </div>`;
+          }
+
+          item.innerHTML = `
+            <div class="file-info-group">
+              ${iconOrThumbHtml}
+              <div class="file-meta">
+                <span class="file-name" title="${file.name}">${file.name}</span>
+                <span class="file-size">${formatBytes(file.size)}</span>
+              </div>
+            </div>
+            <button type="button" class="btn-remove-file" title="Gỡ file này">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          `;
+
+          item.querySelector('.btn-remove-file').addEventListener('click', () => removeFile(index));
+          attachedFilesList.appendChild(item);
+        });
+      }
+
+      // History Handling
+      function addHistory(snippet, type) {
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        recentHistory.unshift({ snippet, type, time: timeStr });
+        if (recentHistory.length > 5) recentHistory.pop();
+        renderHistory();
+      }
+
+      function renderHistory() {
+        if (recentHistory.length === 0) {
+          historyEmpty.classList.remove('hidden');
+          historyList.querySelectorAll('.history-item').forEach(el => el.remove());
+          return;
+        }
+
+        historyEmpty.classList.add('hidden');
+        historyList.querySelectorAll('.history-item').forEach(el => el.remove());
+
+        recentHistory.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'history-item';
+
+          let iconSvg = '';
+          if (item.type === 'file') {
+            iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+          } else if (item.type === 'image') {
+            iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+          } else {
+            iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+          }
+
+          row.innerHTML = `
+            <div class="history-left">
+              <span class="history-type-icon">${iconSvg}</span>
+              <span class="history-snippet" title="${item.snippet}">${item.snippet}</span>
+            </div>
+            <div class="history-right">
+              <span class="history-time">${item.time}</span>
+              <span class="history-tag">Thành công</span>
+            </div>
+          `;
+          historyList.appendChild(row);
+        });
+      }
+
+      clearHistoryBtn.addEventListener('click', () => {
+        recentHistory = [];
+        renderHistory();
+      });
+
+      // --- Send Execution ---
       sendBtn.addEventListener('click', async () => {
         const webhookUrl = localStorage.getItem(STORAGE_KEY_WEBHOOK);
         if (!webhookUrl) {
@@ -824,8 +1410,10 @@
         }
 
         const rawText = messageInput.value.trim();
-        if (!rawText) {
-          showToast('Vui lòng nhập hoặc dán nội dung cần gửi', 'error');
+        const hasFiles = attachedFiles.length > 0;
+
+        if (!rawText && !hasFiles) {
+          showToast('Vui lòng nhập văn bản hoặc đính kèm tệp/ảnh', 'error');
           messageInput.focus();
           return;
         }
@@ -835,35 +1423,66 @@
           return;
         }
 
-        // Format based on target device
-        const isPc = devPcRadio.checked;
+        // Format message
         let formattedText = '';
-        if (isPc) {
-          formattedText = '```\n' + rawText + '\n```';
-        } else {
-          formattedText = '`' + rawText + '`';
+        if (rawText) {
+          const isPc = devPcRadio.checked;
+          if (isPc) {
+            formattedText = '```\n' + rawText + '\n```';
+          } else {
+            formattedText = '`' + rawText + '`';
+          }
         }
 
-        // UI Loading state
+        // UI Loading
         sendBtn.disabled = true;
         const originalContent = sendBtn.innerHTML;
         sendBtn.innerHTML = `<div class="spinner"></div><span>Đang gửi...</span>`;
 
         try {
-          const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              content: formattedText
-            })
-          });
+          let response;
+
+          if (hasFiles) {
+            // Multipart upload for files
+            const formData = new FormData();
+            if (formattedText) {
+              formData.append('payload_json', JSON.stringify({ content: formattedText }));
+            }
+            attachedFiles.forEach((file, index) => {
+              formData.append(`files[${index}]`, file, file.name);
+            });
+
+            response = await fetch(webhookUrl, {
+              method: 'POST',
+              body: formData
+            });
+          } else {
+            // Standard JSON upload for text only
+            response = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: formattedText })
+            });
+          }
 
           if (response.ok || response.status === 204) {
             showToast('Đã gửi về Discord thành công!');
-            // Auto clear text as requested
+
+            // Record History
+            if (hasFiles) {
+              const fileCount = attachedFiles.length;
+              const firstName = attachedFiles[0].name;
+              const type = attachedFiles[0].type.startsWith('image/') ? 'image' : 'file';
+              const summary = fileCount === 1 ? firstName : `${firstName} (+${fileCount - 1} tệp)`;
+              addHistory(summary, type);
+            } else {
+              addHistory(rawText.slice(0, 35) + (rawText.length > 35 ? '...' : ''), 'text');
+            }
+
+            // Reset inputs
             messageInput.value = '';
+            attachedFiles = [];
+            renderAttachedFiles();
             updateCharCounter();
           } else {
             const errData = await response.json().catch(() => ({}));
@@ -878,7 +1497,7 @@
         }
       });
 
-      // Run init
+      // Start
       init();
     })();
   </script>
