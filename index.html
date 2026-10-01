@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Discord Relay • Chuyển văn bản Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #14161a;
+      --card-bg: #1b1e24;
+      --card-border: rgba(255, 255, 255, 0.04);
+      --surface-inset: #121316;
+      --text-main: #f1f3f7;
+      --text-muted: #858b98;
+      --text-dim: #555b68;
+      --accent: #5865f2;
+      --accent-hover: #4752c4;
+      --accent-surface: rgba(88, 101, 242, 0.12);
+      --success: #10b981;
+      --danger: #ef4444;
+      --danger-surface: rgba(239, 68, 68, 0.12);
+      
+      /* Neumorphic shadow layers */
+      --shadow-raised: 
+        -5px -5px 12px rgba(255, 255, 255, 0.025),
+        6px 6px 16px rgba(0, 0, 0, 0.65);
+      --shadow-raised-sm:
+        -3px -3px 8px rgba(255, 255, 255, 0.02),
+        4px 4px 10px rgba(0, 0, 0, 0.55);
+      --shadow-inset: 
+        inset 3px 3px 6px rgba(0, 0, 0, 0.7),
+        inset -2px -2px 6px rgba(255, 255, 255, 0.02);
+      --shadow-active: 
+        inset 2px 2px 4px rgba(0, 0, 0, 0.7),
+        inset -1px -1px 3px rgba(255, 255, 255, 0.03);
+
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 16px;
+      line-height: 1.5;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: auto 0;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+      box-shadow: var(--shadow-raised-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      border: 1px solid var(--card-border);
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .brand-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-inset);
+      box-shadow: var(--shadow-inset);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .status-badge.connected .status-dot {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+
+    .status-badge.connected {
+      color: var(--text-main);
+    }
+
+    /* Main Box / Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-raised);
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Section Label */
+    .field-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Webhook Config */
+    .webhook-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .webhook-input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .inset-input {
+      flex: 1;
+      background: var(--surface-inset);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      box-shadow: var(--shadow-inset);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .inset-input:focus {
+      border-color: rgba(88, 101, 242, 0.5);
+    }
+
+    .inset-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    /* Saved Webhook View */
+    .webhook-saved-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-inset);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      box-shadow: var(--shadow-inset);
+    }
+
+    .webhook-masked {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    .btn-icon-text {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon-text:hover {
+      color: var(--danger);
+      background: var(--danger-surface);
+    }
+
+    /* Buttons */
+    .btn {
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--card-border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(88, 101, 242, 0.4);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.985);
+      box-shadow: 0 2px 6px rgba(88, 101, 242, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--card-bg);
+      color: var(--text-main);
+      box-shadow: var(--shadow-raised-sm);
+    }
+
+    .btn-secondary:hover {
+      color: #ffffff;
+    }
+
+    .btn-secondary:active {
+      box-shadow: var(--shadow-active);
+      transform: scale(0.985);
+    }
+
+    /* Device Selector (Tactile Segmented Control) */
+    .device-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-inset);
+      padding: 5px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-inset);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      gap: 6px;
+    }
+
+    .device-option {
+      position: relative;
+    }
+
+    .device-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .device-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      gap: 4px;
+    }
+
+    .device-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.92rem;
+    }
+
+    .device-format-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .device-option input[type="radio"]:checked + .device-label {
+      background: var(--card-bg);
+      color: var(--text-main);
+      box-shadow: var(--shadow-raised-sm);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .device-option input[type="radio"]:checked + .device-label .device-format-hint {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Textarea Section */
+    .text-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .textarea-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-textarea {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      background: var(--surface-inset);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      box-shadow: var(--shadow-inset);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .content-textarea:focus {
+      border-color: rgba(88, 101, 242, 0.45);
+    }
+
+    .content-textarea::placeholder {
+      color: var(--text-dim);
+    }
+
+    .text-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding: 0 4px;
+    }
+
+    .char-counter {
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .char-counter.warning {
+      color: var(--danger);
+    }
+
+    .btn-clear-text {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-clear-text:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Send Button */
+    .send-btn {
+      width: 100%;
+      padding: 15px;
+      font-size: 0.98rem;
+      letter-spacing: -0.01em;
+      border-radius: var(--radius-md);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 90%;
+      max-width: 380px;
+    }
+
+    .toast {
+      background: #1e2229;
+      color: var(--text-main);
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .toast.success .toast-icon {
+      color: var(--success);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--danger);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer Note */
+    .footer-note {
+      text-align: center;
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      padding: 0 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">
+          <!-- Webhook/Relay Icon -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Cloud Relay</h1>
+          <p class="brand-subtitle">Cầu nối văn bản về Discord</p>
+        </div>
+      </div>
+      <div id="statusBadge" class="status-badge">
+        <span class="status-dot"></span>
+        <span id="statusText">Chưa cấu hình</span>
+      </div>
+    </header>
+
+    <!-- Main Card -->
+    <main class="card">
+      <!-- Webhook Configuration -->
+      <section class="webhook-section">
+        <label class="field-label" for="webhookInput">
+          <span>Discord Webhook</span>
+        </label>
+
+        <!-- Form nhập khi chưa lưu hoặc bấm sửa -->
+        <div id="webhookForm" class="webhook-input-group">
+          <input 
+            type="url" 
+            id="webhookInput" 
+            class="inset-input" 
+            placeholder="https://discord.com/api/webhooks/..." 
+            autocomplete="off" 
+            spellcheck="false"
+          >
+          <button type="button" id="saveWebhookBtn" class="btn btn-secondary">
+            Lưu
+          </button>
+        </div>
+
+        <!-- Thanh hiển thị khi đã lưu -->
+        <div id="webhookSavedBar" class="webhook-saved-bar hidden">
+          <div class="webhook-masked" id="webhookDisplay">https://discord.com/api/webhooks/•••</div>
+          <button type="button" id="deleteWebhookBtn" class="btn-icon-text" title="Xóa webhook để đổi link mới">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            </svg>
+            <span>Đổi / Xóa</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Target Device Selector -->
+      <section>
+        <div class="field-label">Thiết bị nhận (Định dạng copy)</div>
+        <div class="device-group">
+          <div class="device-option">
+            <input type="radio" name="targetDevice" id="devPhone" value="phone" checked>
+            <label for="devPhone" class="device-label">
+              <div class="device-icon-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
+                  <path d="M12 18h.01"></path>
+                </svg>
+                <span>Điện thoại</span>
+              </div>
+              <span class="device-format-hint">Dạng `văn bản`</span>
+            </label>
+          </div>
+
+          <div class="device-option">
+            <input type="radio" name="targetDevice" id="devPc" value="pc">
+            <label for="devPc" class="device-label">
+              <div class="device-icon-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+                  <line x1="8" x2="16" y1="21" y2="21"></line>
+                  <line x1="12" x2="12" y1="17" y2="21"></line>
+                </svg>
+                <span>Máy tính</span>
+              </div>
+              <span class="device-format-hint">Dạng ```code```</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Message Textarea -->
+      <section class="text-section">
+        <label class="field-label" for="messageInput">
+          <span>Nội dung gửi</span>
+        </label>
+        <div class="textarea-wrapper">
+          <textarea 
+            id="messageInput" 
+            class="content-textarea" 
+            placeholder="Dán link hoặc nhập văn bản cần chuyển về máy tại đây..."
+            rows="6"
+          ></textarea>
+        </div>
+        <div class="text-toolbar">
+          <span id="charCounter" class="char-counter">0 / 1990 ký tự</span>
+          <button type="button" id="clearTextBtn" class="btn-clear-text" title="Xóa sạch nội dung">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span>Xóa văn bản</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Action Button -->
+      <button type="button" id="sendBtn" class="btn btn-primary send-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        <span id="sendBtnText">Gửi về Discord</span>
+      </button>
+    </main>
+
+    <footer class="footer-note">
+      Dữ liệu Webhook được lưu trực tiếp trên trình duyệt máy này. Tự động xóa văn bản sau khi gửi thành công.
+    </footer>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    (function() {
+      const STORAGE_KEY_WEBHOOK = 'cloud_relay_discord_webhook';
+      const STORAGE_KEY_DEVICE = 'cloud_relay_target_device';
+      const MAX_DISCORD_CHARS = 1990; // Discord limit is 2000, reserving safe space for backticks
+
+      // DOM Elements
+      const webhookForm = document.getElementById('webhookForm');
+      const webhookSavedBar = document.getElementById('webhookSavedBar');
+      const webhookInput = document.getElementById('webhookInput');
+      const webhookDisplay = document.getElementById('webhookDisplay');
+      const saveWebhookBtn = document.getElementById('saveWebhookBtn');
+      const deleteWebhookBtn = document.getElementById('deleteWebhookBtn');
+      const statusBadge = document.getElementById('statusBadge');
+      const statusText = document.getElementById('statusText');
+
+      const devPhoneRadio = document.getElementById('devPhone');
+      const devPcRadio = document.getElementById('devPc');
+
+      const messageInput = document.getElementById('messageInput');
+      const charCounter = document.getElementById('charCounter');
+      const clearTextBtn = document.getElementById('clearTextBtn');
+      const sendBtn = document.getElementById('sendBtn');
+      const sendBtnText = document.getElementById('sendBtnText');
+      const toastContainer = document.getElementById('toastContainer');
+
+      // Initialize State
+      function init() {
+        const savedWebhook = localStorage.getItem(STORAGE_KEY_WEBHOOK);
+        if (savedWebhook) {
+          showSavedWebhook(savedWebhook);
+        } else {
+          showWebhookInput();
+        }
+
+        const savedDevice = localStorage.getItem(STORAGE_KEY_DEVICE);
+        if (savedDevice === 'pc') {
+          devPcRadio.checked = true;
+        } else {
+          devPhoneRadio.checked = true;
+        }
+
+        updateCharCounter();
+      }
+
+      // Webhook state view helpers
+      function showSavedWebhook(url) {
+        webhookForm.classList.add('hidden');
+        webhookSavedBar.classList.remove('hidden');
+
+        // Mask webhook token for clean UI
+        try {
+          const parsed = new URL(url);
+          const parts = parsed.pathname.split('/');
+          const id = parts[parts.length - 2] || '•••';
+          webhookDisplay.textContent = `.../webhooks/${id}/••••••••`;
+        } catch {
+          webhookDisplay.textContent = 'https://discord.com/api/webhooks/••••';
+        }
+
+        statusBadge.classList.add('connected');
+        statusText.textContent = 'Đã kết nối';
+      }
+
+      function showWebhookInput() {
+        webhookSavedBar.classList.add('hidden');
+        webhookForm.classList.remove('hidden');
+        webhookInput.value = '';
+        statusBadge.classList.remove('connected');
+        statusText.textContent = 'Chưa cấu hình';
+      }
+
+      // Toast feedback
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const iconSvg = type === 'success' 
+          ? `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`
+          : `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+        toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+        toastContainer.appendChild(toast);
+
+        // Animation trigger
+        requestAnimationFrame(() => {
+          toast.classList.add('show');
+        });
+
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 250);
+        }, 3200);
+      }
+
+      // Event: Save Webhook
+      saveWebhookBtn.addEventListener('click', () => {
+        const val = webhookInput.value.trim();
+        if (!val) {
+          showToast('Vui lòng dán link Discord Webhook', 'error');
+          webhookInput.focus();
+          return;
+        }
+
+        if (!val.startsWith('https://discord.com/api/webhooks/') && !val.startsWith('https://canary.discord.com/api/webhooks/')) {
+          showToast('Link Webhook Discord không hợp lệ', 'error');
+          webhookInput.focus();
+          return;
+        }
+
+        localStorage.setItem(STORAGE_KEY_WEBHOOK, val);
+        showSavedWebhook(val);
+        showToast('Đã lưu Webhook vào trình duyệt!');
+      });
+
+      // Event: Delete / Change Webhook
+      deleteWebhookBtn.addEventListener('click', () => {
+        if (confirm('Bạn có muốn xóa Webhook hiện tại để nhập liên kết mới?')) {
+          localStorage.removeItem(STORAGE_KEY_WEBHOOK);
+          showWebhookInput();
+          webhookInput.focus();
+          showToast('Đã xóa Webhook cũ');
+        }
+      });
+
+      // Event: Device Choice Change
+      devPhoneRadio.addEventListener('change', () => {
+        localStorage.setItem(STORAGE_KEY_DEVICE, 'phone');
+      });
+      devPcRadio.addEventListener('change', () => {
+        localStorage.setItem(STORAGE_KEY_DEVICE, 'pc');
+      });
+
+      // Event: Clear Text
+      clearTextBtn.addEventListener('click', () => {
+        if (!messageInput.value) return;
+        messageInput.value = '';
+        updateCharCounter();
+        messageInput.focus();
+      });
+
+      // Character count update
+      function updateCharCounter() {
+        const len = messageInput.value.length;
+        charCounter.textContent = `${len} / ${MAX_DISCORD_CHARS} ký tự`;
+        if (len > MAX_DISCORD_CHARS) {
+          charCounter.classList.add('warning');
+        } else {
+          charCounter.classList.remove('warning');
+        }
+      }
+
+      messageInput.addEventListener('input', updateCharCounter);
+
+      // Event: Send Message
+      sendBtn.addEventListener('click', async () => {
+        const webhookUrl = localStorage.getItem(STORAGE_KEY_WEBHOOK);
+        if (!webhookUrl) {
+          showToast('Vui lòng dán và lưu Webhook trước khi gửi', 'error');
+          return;
+        }
+
+        const rawText = messageInput.value.trim();
+        if (!rawText) {
+          showToast('Vui lòng nhập hoặc dán nội dung cần gửi', 'error');
+          messageInput.focus();
+          return;
+        }
+
+        if (rawText.length > MAX_DISCORD_CHARS) {
+          showToast(`Nội dung vượt quá giới hạn Discord (${MAX_DISCORD_CHARS} ký tự)`, 'error');
+          return;
+        }
+
+        // Format based on target device
+        const isPc = devPcRadio.checked;
+        let formattedText = '';
+        if (isPc) {
+          formattedText = '```\n' + rawText + '\n```';
+        } else {
+          formattedText = '`' + rawText + '`';
+        }
+
+        // UI Loading state
+        sendBtn.disabled = true;
+        const originalContent = sendBtn.innerHTML;
+        sendBtn.innerHTML = `<div class="spinner"></div><span>Đang gửi...</span>`;
+
+        try {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              content: formattedText
+            })
+          });
+
+          if (response.ok || response.status === 204) {
+            showToast('Đã gửi về Discord thành công!');
+            // Auto clear text as requested
+            messageInput.value = '';
+            updateCharCounter();
+          } else {
+            const errData = await response.json().catch(() => ({}));
+            const msg = errData.message || `Lỗi Discord (mã ${response.status})`;
+            showToast(`Gửi thất bại: ${msg}`, 'error');
+          }
+        } catch (err) {
+          showToast('Không thể kết nối đến Discord (kiểm tra mạng hoặc URL)', 'error');
+        } finally {
+          sendBtn.disabled = false;
+          sendBtn.innerHTML = originalContent;
+        }
+      });
+
+      // Run init
+      init();
+    })();
+  </script>
+</body>
+</html>
